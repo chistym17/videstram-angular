@@ -47,7 +47,6 @@ import { Video } from '../../services/video.service';
           controls
           preload="auto"
           autoplay
-          muted
           disablePictureInPicture
           controlsList="nodownload nofullscreen noremoteplayback"
         >
@@ -193,150 +192,174 @@ import { Video } from '../../services/video.service';
       left: 0 !important;
       right: 0 !important;
       transition: opacity 0.3s ease !important;
+      align-items: center !important;
+      gap: 0.75em !important;
     }
 
-    /* Individual Control Elements */
+    /* Individual Control Elements - Text Buttons */
     :host ::ng-deep .vjs-button {
-      display: inline-block !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       visibility: visible !important;
       opacity: 1 !important;
       cursor: pointer !important;
       flex: none !important;
-      width: 3em !important;
-      height: 3em !important;
-      margin: 0 0.2em !important;
-      padding: 0 !important;
+      min-width: 36px !important;
+      height: 24px !important;
+      margin: 0 !important;
+      padding: 0 6px !important;
       border: none !important;
       background: transparent !important;
       color: white !important;
+      position: relative !important;
+      border-radius: 2px !important;
+      font-family: Arial, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.3px !important;
+      transition: all 0.2s ease !important;
     }
 
     :host ::ng-deep .vjs-button:hover {
+      background-color: rgba(99, 102, 241, 0.15) !important;
       color: #6366f1 !important;
     }
 
-    :host ::ng-deep .vjs-button > .vjs-icon-placeholder:before {
-      line-height: 2.2 !important;
-      font-size: 1.2em !important;
+    :host ::ng-deep .vjs-button:active {
+      background-color: rgba(99, 102, 241, 0.25) !important;
     }
 
-    /* Progress Control */
-    :host ::ng-deep .vjs-progress-control {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      position: absolute !important;
-      top: -0.5em !important;
-      right: 0 !important;
-      left: 0 !important;
+    /* Play/Pause Button */
+    :host ::ng-deep .vjs-play-control .vjs-icon-placeholder:before {
+      content: "Play" !important;
+    }
+
+    :host ::ng-deep .vjs-play-control.vjs-playing .vjs-icon-placeholder:before {
+      content: "Pause" !important;
+    }
+
+    /* Volume Button */
+    :host ::ng-deep .vjs-mute-control {
+      order: 2 !important;
+    }
+
+    :host ::ng-deep .vjs-mute-control .vjs-icon-placeholder:before {
+      content: "Sound" !important;
+    }
+
+    :host ::ng-deep .vjs-mute-control.vjs-vol-0 .vjs-icon-placeholder:before {
+      content: "Mute" !important;
+    }
+
+    /* Fullscreen Button */
+    :host ::ng-deep .vjs-fullscreen-control .vjs-icon-placeholder:before {
+      content: "Full" !important;
+    }
+
+    :host ::ng-deep .vjs-fullscreen-control.vjs-fullscreen .vjs-icon-placeholder:before {
+      content: "Exit" !important;
+    }
+
+    /* Hide any fallback text */
+    :host ::ng-deep .vjs-control-text {
+      display: none !important;
+    }
+
+    /* Clean up icon placeholder */
+    :host ::ng-deep .vjs-icon-placeholder {
       width: 100% !important;
-      height: 0.5em !important;
-      background: transparent !important;
-    }
-
-    :host ::ng-deep .vjs-progress-holder {
       height: 100% !important;
-      background-color: rgba(255, 255, 255, 0.3) !important;
-      border-radius: 0.25em !important;
-      overflow: hidden !important;
-    }
-
-    :host ::ng-deep .vjs-play-progress {
-      background-color: #6366f1 !important;
-      border-radius: 0.25em !important;
-    }
-
-    :host ::ng-deep .vjs-load-progress {
-      background-color: rgba(255, 255, 255, 0.15) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: inherit !important;
+      line-height: 1 !important;
     }
 
     /* Time Controls */
     :host ::ng-deep .vjs-time-control {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+      display: flex !important;
+      align-items: center !important;
       padding: 0 0.5em !important;
-      line-height: 3em !important;
-      font-size: 0.9em !important;
+      font-size: 11px !important;
       color: white !important;
       min-width: auto !important;
-    }
-
-    :host ::ng-deep .vjs-current-time,
-    :host ::ng-deep .vjs-duration {
-      display: block !important;
+      font-family: Arial, sans-serif !important;
+      height: 24px !important;
+      padding: 0 6px !important;
+      background: transparent !important;
     }
 
     :host ::ng-deep .vjs-time-divider {
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      padding: 0 0.2em !important;
-      line-height: 3em !important;
-      color: white !important;
+      padding: 0 0.5em !important;
+      color: rgba(255, 255, 255, 0.7) !important;
     }
 
     /* Volume Panel */
     :host ::ng-deep .vjs-volume-panel {
       display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
       align-items: center !important;
+      margin-right: 0.5em !important;
+      padding: 0 6px !important;
+      height: 24px !important;
+      background: transparent !important;
     }
 
     :host ::ng-deep .vjs-volume-control {
       display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      width: 5em !important;
+      align-items: center !important;
+      width: 60px !important;
       background: transparent !important;
     }
 
     :host ::ng-deep .vjs-volume-bar {
       background-color: rgba(255, 255, 255, 0.3) !important;
-      border-radius: 0.25em !important;
+      border-radius: 4px !important;
+      height: 4px !important;
     }
 
     :host ::ng-deep .vjs-volume-level {
       background-color: #6366f1 !important;
-      border-radius: 0.25em !important;
+      border-radius: 4px !important;
     }
 
-    /* Fullscreen Control */
-    :host ::ng-deep .vjs-fullscreen-control {
+    /* Playback Rate Button */
+    :host ::ng-deep .vjs-playback-rate .vjs-playback-rate-value {
       display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-
-    /* Playback Rate Menu */
-    :host ::ng-deep .vjs-playback-rate {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      color: white !important;
+      width: 100% !important;
+      height: 100% !important;
+      text-transform: uppercase !important;
     }
 
     /* Menu Styling */
     :host ::ng-deep .vjs-menu {
-      background-color: rgba(0, 0, 0, 0.8) !important;
-      border-radius: 0.25rem !important;
+      background-color: rgba(0, 0, 0, 0.95) !important;
+      border-radius: 2px !important;
+      padding: 4px 0 !important;
     }
 
     :host ::ng-deep .vjs-menu-item {
       color: white !important;
-      padding: 0.5em 1em !important;
+      padding: 4px 8px !important;
+      font-size: 11px !important;
+      font-family: Arial, sans-serif !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.3px !important;
     }
 
     :host ::ng-deep .vjs-menu-item:hover {
-      background-color: #6366f1 !important;
+      background-color: rgba(99, 102, 241, 0.2) !important;
+      color: #6366f1 !important;
     }
 
-    /* Hide download button completely */
-    :host ::ng-deep .vjs-download-button {
-      display: none !important;
-    }
-
-    /* Ensure player responsiveness */
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       .fixed-container {
         height: 250px;
@@ -345,18 +368,30 @@ import { Video } from '../../services/video.service';
       
       :host ::ng-deep .vjs-control-bar {
         height: 3em !important;
-        padding: 0 0.5em !important;
+        padding: 0 0.75em !important;
+        gap: 0.5em !important;
       }
       
       :host ::ng-deep .vjs-button {
-        width: 2.5em !important;
-        height: 2.5em !important;
-        margin: 0 0.1em !important;
+        min-width: 32px !important;
+        height: 22px !important;
+        padding: 0 4px !important;
+        font-size: 10px !important;
       }
-      
+
       :host ::ng-deep .vjs-time-control {
-        font-size: 0.8em !important;
-        padding: 0 0.3em !important;
+        font-size: 10px !important;
+        padding: 0 4px !important;
+        height: 22px !important;
+      }
+
+      :host ::ng-deep .vjs-volume-control {
+        width: 50px !important;
+      }
+
+      :host ::ng-deep .vjs-volume-panel {
+        height: 22px !important;
+        padding: 0 4px !important;
       }
     }
   `]
@@ -450,7 +485,8 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
         fluid: false,
         responsive: false,
         autoplay: true,
-        muted: true,
+        muted: false,
+        volume: 0.7,
         playbackRates: [0.5, 1, 1.5, 2],
         controlBar: {
           children: [
@@ -462,7 +498,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
             'durationDisplay',
             'playbackRateMenuButton',
             'fullscreenToggle'
-          ].filter(Boolean), // Remove any undefined controls
+          ].filter(Boolean),
           volumePanel: {
             inline: false,
             volumeControl: {
@@ -485,7 +521,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
         }
       });
 
-      // Force control bar to be visible
+      // Force control bar to be visible and set initial volume
       this.player.ready(() => {
         const controlBar = this.player.controlBar;
         if (controlBar) {
@@ -494,6 +530,10 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
           controlBar.el_.style.visibility = 'visible';
           controlBar.el_.style.opacity = '1';
         }
+
+        // Set initial volume and ensure it's not muted
+        this.player.volume(0.7);
+        this.player.muted(false);
 
         this.player.el().addEventListener('contextmenu', (e: Event) => e.preventDefault());
         this.player.pictureInPicture = () => false;
@@ -536,6 +576,9 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
       
       this.player.one('loadeddata', () => {
         this.isLoading = false;
+        // Ensure volume is set and not muted when video loads
+        this.player.volume(0.7);
+        this.player.muted(false);
         this.player.play().catch((error: any) => {
           console.log('Autoplay after source update failed:', error);
           this.isLoading = false;
