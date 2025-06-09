@@ -68,7 +68,6 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
   constructor() {}
 
   ngAfterViewInit() {
-    // Wait for the next tick to ensure the view is fully rendered
     setTimeout(() => {
       this.initializePlayer();
     }, 0);
@@ -116,7 +115,6 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
 
       this.isPlayerInitialized = true;
 
-      // Ensure autoplay works
       this.player.ready(() => {
         if (this.video) {
           this.updateVideoSource();
@@ -140,7 +138,6 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
       });
       this.player.load();
       
-      // Try to play after source is loaded
       this.player.one('loadeddata', () => {
         this.player.play().catch((error: any) => {
           console.log('Autoplay after source update failed:', error);
