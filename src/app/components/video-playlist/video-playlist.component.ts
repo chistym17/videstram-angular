@@ -23,7 +23,7 @@ import { Video } from '../../services/video.service';
                 class="w-full h-full object-cover"
               />
               <div class="absolute bottom-1 right-1 bg-black bg-opacity-75 text-white text-xs px-1.5 py-0.5 rounded">
-                {{ formatDuration(video.duration) }}
+                {{ video.duration }}
               </div>
               @if (video.id === selectedVideoId) {
                 <div class="absolute inset-0 bg-indigo-600 bg-opacity-20 flex items-center justify-center">
@@ -61,11 +61,5 @@ export class VideoPlaylistComponent {
 
   onVideoClick(video: Video) {
     this.videoSelected.emit(video);
-  }
-
-  formatDuration(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }
 } 

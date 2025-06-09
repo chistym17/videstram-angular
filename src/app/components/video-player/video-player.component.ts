@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, AfterViewInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
@@ -9,7 +9,36 @@ import { Video } from '../../services/video.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="video-container bg-black rounded-lg overflow-hidden">
+    <!-- NoScript Warning -->
+    <noscript>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">JavaScript Required</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <p>This video player requires JavaScript to be enabled. Please enable JavaScript in your browser settings to continue.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </noscript>
+
+    <!-- Video Player Container -->
+    <div class="video-container bg-black rounded-lg overflow-hidden relative" 
+         (contextmenu)="onRightClick($event)"
+         (keydown)="onKeyDown($event)">
+      <!-- Security Overlay -->
+      <div class="absolute inset-0 pointer-events-none z-10" 
+           (contextmenu)="onRightClick($event)"
+           (selectstart)="onSelectStart($event)"
+           (dragstart)="onDragStart($event)">
+      </div>
+
       <div class="aspect-w-16 aspect-h-9">
         <video
           #videoPlayer
@@ -20,6 +49,8 @@ import { Video } from '../../services/video.service';
           height="100%"
           autoplay
           muted
+          disablePictureInPicture
+          controlsList="nodownload nofullscreen noremoteplayback"
         >
           <p class="vjs-no-js">
             To view this video please enable JavaScript, and consider upgrading to a
@@ -27,6 +58,12 @@ import { Video } from '../../services/video.service';
           </p>
         </video>
       </div>
+
+      <!-- Security Notice -->
+      <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded pointer-events-none">
+        Protected Content
+      </div>
+
       @if (video) {
         <div class="mt-4 p-4 bg-white">
           <h2 class="text-xl font-semibold text-gray-900">{{ video.title }}</h2>
@@ -39,6 +76,10 @@ import { Video } from '../../services/video.service';
     :host {
       display: block;
       width: 100%;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
     }
     .video-container {
       @apply shadow-lg;
@@ -56,6 +97,10 @@ import { Video } from '../../services/video.service';
     :host ::ng-deep .vjs-control-bar {
       @apply bg-black bg-opacity-75;
     }
+    /* Disable video.js download button */
+    :host ::ng-deep .vjs-download-button {
+      display: none !important;
+    }
   `]
 })
 export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy {
@@ -65,7 +110,10 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
   private player?: any;
   private isPlayerInitialized = false;
 
-  constructor() {}
+  constructor() {
+    document.addEventListener('contextmenu', this.onRightClick.bind(this));
+    document.addEventListener('keydown', this.onKeyDown.bind(this));
+  }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -84,6 +132,46 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
       this.player.dispose();
       this.isPlayerInitialized = false;
     }
+    document.removeEventListener('contextmenu', this.onRightClick.bind(this));
+    document.removeEventListener('keydown', this.onKeyDown.bind(this));
+  }
+
+  @HostListener('contextmenu', ['$event'])
+  onRightClick(event: MouseEvent): boolean {
+    event.preventDefault();
+    return false;
+  }
+
+  @HostListener('keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    const forbiddenKeys = [
+      'F12', 
+      'Ctrl+Shift+I', 
+      'Ctrl+Shift+J', 
+      'Ctrl+Shift+C', 
+      'Ctrl+U', 
+      'Ctrl+S', 
+      'Ctrl+P', 
+      'PrintScreen' 
+    ];
+
+    if (forbiddenKeys.includes(event.key) || 
+        (event.ctrlKey && event.shiftKey) || 
+        (event.ctrlKey && event.key === 'u')) {
+      event.preventDefault();
+    }
+  }
+
+  @HostListener('selectstart', ['$event'])
+  onSelectStart(event: Event): boolean {
+    event.preventDefault();
+    return false;
+  }
+
+  @HostListener('dragstart', ['$event'])
+  onDragStart(event: Event): boolean {
+    event.preventDefault();
+    return false;
   }
 
   private initializePlayer() {
@@ -110,12 +198,21 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
             'playbackRateMenuButton',
             'fullscreenToggle'
           ]
+        },
+        html5: {
+          nativeVideoTracks: true,
+          nativeAudioTracks: true,
+          nativeTextTracks: true
         }
       });
 
-      this.isPlayerInitialized = true;
-
       this.player.ready(() => {
+        this.player.el().addEventListener('contextmenu', (e: Event) => e.preventDefault());
+        
+        this.player.pictureInPicture = () => false;
+        
+        this.player.controlBar.removeChild('DownloadButton');
+        
         if (this.video) {
           this.updateVideoSource();
         }
@@ -123,6 +220,8 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
           console.log('Autoplay failed:', error);
         });
       });
+
+      this.isPlayerInitialized = true;
     } catch (error) {
       console.error('Error initializing video player:', error);
     }
