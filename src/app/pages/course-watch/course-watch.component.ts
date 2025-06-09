@@ -37,7 +37,11 @@ import { switchMap } from 'rxjs/operators';
             <div class="ml-3">
               <h3 class="text-sm font-medium text-blue-800">Demo Mode</h3>
               <div class="mt-1 text-sm text-blue-700">
-                <p>This is a demonstration version using sample videos. In the production environment, these will be replaced with actual course content.</p>
+                @if (course?.id === 'physics-201') {
+                  <p>This course uses sample videos hosted on Cloudflare R2 for demonstration purposes. In the production environment, these will be replaced with actual course content.</p>
+                } @else {
+                  <p>This is a demonstration version using sample videos. In the production environment, these will be replaced with actual course content.</p>
+                }
               </div>
             </div>
           </div>

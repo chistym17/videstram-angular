@@ -15,6 +15,7 @@ export interface Video {
 
 // Dummy video data
 const DUMMY_VIDEOS: Video[] = [
+  // Math 101 videos
   {
     id: 'video-1',
     title: 'Introduction to the Course',
@@ -64,6 +65,48 @@ const DUMMY_VIDEOS: Video[] = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     courseId: 'math-101',
     order: 5
+  },
+
+  // Physics 201 (Quantum Mechanics) videos from Cloudflare
+  {
+    id: 'physics-video-1',
+    title: 'Introduction to Quantum Mechanics',
+    description: 'An overview of quantum mechanics and its fundamental principles.',
+    duration: '15:30',
+    thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=500&auto=format',
+    videoUrl: 'https://pub-eb55c571432c4e44a453fa3f1d7edd5d.r2.dev/video3.mp4',
+    courseId: 'physics-201',
+    order: 1
+  },
+  {
+    id: 'physics-video-2',
+    title: 'Wave Functions and Probability',
+    description: 'Understanding wave functions and their role in quantum probability.',
+    duration: '18:45',
+    thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=500&auto=format',
+    videoUrl: 'https://pub-eb55c571432c4e44a453fa3f1d7edd5d.r2.dev/video5.mp4',
+    courseId: 'physics-201',
+    order: 2
+  },
+  {
+    id: 'physics-video-3',
+    title: 'Quantum States and Superposition',
+    description: 'Exploring quantum states and the principle of superposition.',
+    duration: '20:00',
+    thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=500&auto=format',
+    videoUrl: 'https://pub-eb55c571432c4e44a453fa3f1d7edd5d.r2.dev/SampleVideo_1280x720_2mb.mp4',
+    courseId: 'physics-201',
+    order: 3
+  },
+  {
+    id: 'physics-video-4',
+    title: 'Quantum Entanglement',
+    description: 'Understanding the phenomenon of quantum entanglement and its implications.',
+    duration: '22:15',
+    thumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=500&auto=format',
+    videoUrl: 'https://pub-eb55c571432c4e44a453fa3f1d7edd5d.r2.dev/video10.mp4',
+    courseId: 'physics-201',
+    order: 4
   }
 ];
 
