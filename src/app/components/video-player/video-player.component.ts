@@ -30,8 +30,16 @@ import { Video } from '../../services/video.service';
 
     <!-- Fixed Size Container -->
     <div class="fixed-container">
+      <!-- Loading State -->
+      @if (isLoading) {
+        <div class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Loading video player...</p>
+        </div>
+      }
+
       <!-- Video Player -->
-      <div class="video-player-wrapper">
+      <div class="video-player-wrapper" [class.hidden]="isLoading">
         <video
           #videoPlayer
           class="video-js vjs-big-play-centered vjs-theme-city"
@@ -73,6 +81,9 @@ import { Video } from '../../services/video.service';
       height: 360px;
       margin: 0 auto;
       position: relative;
+      background: #000;
+      border-radius: 0.5rem;
+      overflow: hidden;
     }
 
     .video-player-wrapper {
@@ -82,6 +93,46 @@ import { Video } from '../../services/video.service';
       position: absolute;
       top: 0;
       left: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .video-player-wrapper.hidden {
+      opacity: 0;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #6366f1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .loading-text {
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     :host ::ng-deep .video-js {
@@ -116,7 +167,7 @@ import { Video } from '../../services/video.service';
 
     /* Ensure video info stays below the fixed container */
     .video-info {
-      margin-top: 380px; /* fixed-container height + some spacing */
+      margin-top: 380px;
       padding: 0 1rem;
     }
   `]
@@ -127,6 +178,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private player?: any;
   private isPlayerInitialized = false;
+  isLoading = true;
 
   constructor() {
     document.addEventListener('contextmenu', this.onRightClick.bind(this));
@@ -141,6 +193,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['video'] && this.isPlayerInitialized && this.player) {
+      this.isLoading = true;
       this.updateVideoSource();
     }
   }
@@ -226,22 +279,31 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
 
       this.player.ready(() => {
         this.player.el().addEventListener('contextmenu', (e: Event) => e.preventDefault());
-        
         this.player.pictureInPicture = () => false;
-        
         this.player.controlBar.removeChild('DownloadButton');
         
         if (this.video) {
           this.updateVideoSource();
         }
+
+        this.player.one('loadeddata', () => {
+          this.isLoading = false;
+          this.isPlayerInitialized = true;
+        });
+
+        this.player.on('error', () => {
+          this.isLoading = true;
+        });
+
         this.player.play().catch((error: any) => {
           console.log('Autoplay failed:', error);
+          this.isLoading = false;
         });
       });
 
-      this.isPlayerInitialized = true;
     } catch (error) {
       console.error('Error initializing video player:', error);
+      this.isLoading = false;
     }
   }
 
@@ -256,12 +318,19 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
       this.player.load();
       
       this.player.one('loadeddata', () => {
+        this.isLoading = false;
         this.player.play().catch((error: any) => {
           console.log('Autoplay after source update failed:', error);
+          this.isLoading = false;
         });
+      });
+
+      this.player.on('error', () => {
+        this.isLoading = true;
       });
     } catch (error) {
       console.error('Error updating video source:', error);
+      this.isLoading = false;
     }
   }
 } 
