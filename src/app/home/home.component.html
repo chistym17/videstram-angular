@@ -1,0 +1,94 @@
+<div class="hero-container">
+    <!-- Background blur elements -->
+    <div class="bg-blur bg-blur-1"></div>
+    <div class="bg-blur bg-blur-2"></div>
+    <div class="bg-blur bg-blur-3"></div>
+
+    <div class="main-content">
+        <!-- Left Content -->
+        <div class="left-content">
+            <div class="fade-in">
+                <span class="badge">
+                    <i class="fas fa-star"></i>
+                    #1 Educational Platform
+                </span>
+            </div>
+
+            <h1 class="main-title fade-in fade-in-delay-1">
+                Learn
+                <span class="gradient-text"> Without </span>
+                Limits
+            </h1>
+
+            <p class="description fade-in fade-in-delay-2">
+                Transform your learning journey with EduStream's cutting-edge video platform. 
+                Access world-class courses, expert instructors, and interactive content anytime, anywhere.
+            </p>
+
+            <div class="button-group fade-in fade-in-delay-3">
+                <a routerLink="/watch" class="btn btn-primary" (click)="startWatching()">
+                    <i class="fas fa-play"></i>
+                    Start Watching
+                    <i class="fas fa-arrow-right" style="margin-left: 0.5rem; margin-right: 0;"></i>
+                </a>
+
+                <a routerLink="/courses" class="btn btn-secondary" (click)="browseCourses()">
+                    <i class="fas fa-book-open"></i>
+                    Browse Courses
+                </a>
+            </div>
+
+            <div class="stats fade-in fade-in-delay-4">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <span>{{stats.students}} Students</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-star"></i>
+                    <span>{{stats.rating}} Rating</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content - Video Preview -->
+        <div class="right-content">
+            <div class="video-container fade-in-right">
+                <div class="video-preview">
+                    <div class="video-content">
+                        <button class="play-button" (click)="playVideo()">
+                            <i class="fas fa-play"></i>
+                        </button>
+
+                        <div class="video-badge badge-top">
+                            HD Quality
+                        </div>
+
+                        <div class="video-badge badge-bottom">
+                            Interactive Learning
+                        </div>
+                    </div>
+                </div>
+
+                <div class="floating-card card-top">
+                    <div class="card-content">
+                        <div class="card-icon card-icon-1"></div>
+                        <div class="card-text">
+                            <h4>React Masterclass</h4>
+                            <p>2.5k enrolled</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="floating-card card-bottom">
+                    <div class="card-content">
+                        <div class="card-icon card-icon-2"></div>
+                        <div class="card-text">
+                            <h4>Design Systems</h4>
+                            <p>1.8k enrolled</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
