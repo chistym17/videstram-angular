@@ -1,291 +1,148 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to continue your learning journey</p>
-        </div>
+    <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Sign in to your account
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          Or
+          <a routerLink="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">
+            create a new account
+          </a>
+        </p>
+      </div>
 
-        <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="auth-form">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <div class="input-wrapper">
-              <i class="fas fa-envelope"></i>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                [(ngModel)]="email"
-                required
-                email
-                #emailInput="ngModel"
-                placeholder="Enter your email"
-                [class.error]="emailInput.invalid && emailInput.touched"
-              >
+      <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form class="space-y-6" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <div class="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  [(ngModel)]="email"
+                  #emailInput="ngModel"
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  [class.border-red-300]="emailInput.invalid && emailInput.touched"
+                >
+                @if (emailInput.invalid && emailInput.touched) {
+                  <p class="mt-2 text-sm text-red-600">
+                    Please enter a valid email address
+                  </p>
+                }
+              </div>
             </div>
-            <div class="error-message" *ngIf="emailInput.invalid && emailInput.touched">
-              Please enter a valid email address
-            </div>
-          </div>
 
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="input-wrapper">
-              <i class="fas fa-lock"></i>
-              <input
-                [type]="showPassword ? 'text' : 'password'"
-                id="password"
-                name="password"
-                [(ngModel)]="password"
-                required
-                minlength="6"
-                #passwordInput="ngModel"
-                placeholder="Enter your password"
-                [class.error]="passwordInput.invalid && passwordInput.touched"
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div class="mt-1 relative">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  id="password"
+                  name="password"
+                  required
+                  [(ngModel)]="password"
+                  #passwordInput="ngModel"
+                  class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  [class.border-red-300]="passwordInput.invalid && passwordInput.touched"
+                >
+                <button
+                  type="button"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  (click)="showPassword = !showPassword"
+                >
+                  <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                </button>
+                @if (passwordInput.invalid && passwordInput.touched) {
+                  <p class="mt-2 text-sm text-red-600">
+                    Password is required
+                  </p>
+                }
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  [(ngModel)]="rememberMe"
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                >
+                <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
+              </div>
+
+              <div class="text-sm">
+                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                  Forgot your password?
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                [disabled]="loginForm.invalid || isLoading"
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-              <button 
-                type="button" 
-                class="toggle-password"
-                (click)="showPassword = !showPassword">
-                <i class="fas" [class]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                @if (isLoading) {
+                  <i class="fas fa-spinner fa-spin mr-2"></i>
+                  Signing in...
+                } @else {
+                  Sign in
+                }
               </button>
             </div>
-            <div class="error-message" *ngIf="passwordInput.invalid && passwordInput.touched">
-              Password must be at least 6 characters
-            </div>
-          </div>
-
-          <div class="form-options">
-            <label class="remember-me">
-              <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe">
-              <span>Remember me</span>
-            </label>
-            <a routerLink="/forgot-password" class="forgot-password">Forgot Password?</a>
-          </div>
-
-          <button 
-            type="submit" 
-            class="btn btn-primary" 
-            [disabled]="loginForm.invalid || isLoading">
-            <i class="fas" [class]="isLoading ? 'fa-spinner fa-spin' : 'fa-sign-in-alt'"></i>
-            {{ isLoading ? 'Signing in...' : 'Sign In' }}
-          </button>
-        </form>
-
-        <div class="auth-footer">
-          <p>Don't have an account? <a routerLink="/signup">Sign up</a></p>
+          </form>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .auth-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      background: linear-gradient(135deg, #ffffff 0%, #dbeafe 50%, #e0e7ff 100%);
-    }
-
-    .auth-card {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .auth-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .auth-header h1 {
-      font-size: 1.875rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 0.5rem;
-    }
-
-    .auth-header p {
-      color: #6b7280;
-    }
-
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .form-group label {
-      font-weight: 500;
-      color: #374151;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-wrapper i {
-      position: absolute;
-      left: 1rem;
-      color: #9ca3af;
-    }
-
-    .input-wrapper input {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-    }
-
-    .input-wrapper input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .input-wrapper input.error {
-      border-color: #ef4444;
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 1rem;
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      cursor: pointer;
-      padding: 0.25rem;
-    }
-
-    .toggle-password:hover {
-      color: #6b7280;
-    }
-
-    .error-message {
-      color: #ef4444;
-      font-size: 0.875rem;
-    }
-
-    .form-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.875rem;
-    }
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #6b7280;
-    }
-
-    .remember-me input[type="checkbox"] {
-      width: 1rem;
-      height: 1rem;
-      border-radius: 0.25rem;
-      border: 1px solid #d1d5db;
-    }
-
-    .forgot-password {
-      color: #3b82f6;
-      text-decoration: none;
-    }
-
-    .forgot-password:hover {
-      text-decoration: underline;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: linear-gradient(90deg, #2563eb, #4f46e5);
-      color: white;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
-    }
-
-    .auth-footer {
-      margin-top: 2rem;
-      text-align: center;
-      color: #6b7280;
-    }
-
-    .auth-footer a {
-      color: #3b82f6;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .auth-footer a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 640px) {
-      .auth-card {
-        padding: 1.5rem;
-      }
+    :host {
+      display: block;
     }
   `]
 })
 export class LoginComponent {
-  email = '';
-  password = '';
-  rememberMe = false;
-  showPassword = false;
-  isLoading = false;
+  email: string = '';
+  password: string = '';
+  rememberMe: boolean = false;
+  showPassword: boolean = false;
+  isLoading: boolean = false;
+  returnUrl: string = '/courses';
 
   constructor(
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastService: ToastService
-  ) {}
+  ) {
+    // Get return url from route parameters or default to '/courses'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/courses';
+  }
 
   async onSubmit() {
     if (this.isLoading) return;
@@ -294,7 +151,7 @@ export class LoginComponent {
     try {
       await this.authService.login(this.email, this.password);
       this.toastService.success('Successfully logged in!');
-      this.router.navigate(['/']);
+      this.router.navigateByUrl(this.returnUrl);
     } catch (error) {
       this.toastService.error('Login failed. Please check your credentials.');
     } finally {
