@@ -28,19 +28,10 @@ import { Video } from '../../services/video.service';
       </div>
     </noscript>
 
-    <!-- Video Player Container -->
-    <div class="video-container bg-black rounded-lg overflow-hidden relative" 
-         (contextmenu)="onRightClick($event)"
-         (keydown)="onKeyDown($event)">
-      <!-- Security Overlay -->
-      <div class="absolute inset-0 pointer-events-none z-10" 
-           (contextmenu)="onRightClick($event)"
-           (selectstart)="onSelectStart($event)"
-           (dragstart)="onDragStart($event)">
-      </div>
-
-      <!-- Video Wrapper -->
-      <div class="video-wrapper">
+    <!-- Fixed Size Container -->
+    <div class="fixed-container">
+      <!-- Video Player -->
+      <div class="video-player-wrapper">
         <video
           #videoPlayer
           class="video-js vjs-big-play-centered vjs-theme-city"
@@ -56,19 +47,14 @@ import { Video } from '../../services/video.service';
             web browser that supports HTML5 video
           </p>
         </video>
-      </div>
 
-      <!-- Security Notice -->
-      <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded pointer-events-none">
-        Protected Content
+        @if (video) {
+          <div class="mt-3">
+            <h2 class="text-xl font-semibold text-gray-900">{{ video.title }}</h2>
+            <p class="mt-1 text-gray-600">{{ video.description }}</p>
+          </div>
+        }
       </div>
-
-      @if (video) {
-        <div class="mt-4 p-4 bg-white">
-          <h2 class="text-xl font-semibold text-gray-900">{{ video.title }}</h2>
-          <p class="mt-2 text-gray-600">{{ video.description }}</p>
-        </div>
-      }
     </div>
   `,
   styles: [`
@@ -81,38 +67,29 @@ import { Video } from '../../services/video.service';
       -ms-user-select: none;
     }
 
-    .video-container {
-      @apply shadow-lg;
+    .fixed-container {
       width: 100%;
-      max-width: 100%;
+      max-width: 800px;
+      height: 360px;
       margin: 0 auto;
-    }
-
-    .video-wrapper {
       position: relative;
-      width: 100%;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
-      background: #000;
-      overflow: hidden;
     }
 
-    .video-wrapper video {
+    .video-player-wrapper {
+      width: 100%;
+      height: 100%;
+      padding: 1rem;
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
     }
 
     :host ::ng-deep .video-js {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
+      background: #000;
+      border-radius: 0.5rem;
+      overflow: hidden;
     }
 
     :host ::ng-deep .vjs-tech {
@@ -121,7 +98,7 @@ import { Video } from '../../services/video.service';
 
     :host ::ng-deep .vjs-big-play-button {
       @apply bg-indigo-600 border-indigo-600;
-      @apply transform scale-125;
+      @apply transform scale-110;
     }
 
     :host ::ng-deep .vjs-big-play-button:hover {
@@ -137,13 +114,10 @@ import { Video } from '../../services/video.service';
       display: none !important;
     }
 
-    /* Ensure controls stay within container */
-    :host ::ng-deep .vjs-control-bar {
-      position: absolute !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
+    /* Ensure video info stays below the fixed container */
+    .video-info {
+      margin-top: 380px; /* fixed-container height + some spacing */
+      padding: 0 1rem;
     }
   `]
 })
@@ -227,11 +201,10 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
     try {
       this.player = videojs(this.videoPlayerElement.nativeElement, {
         fluid: false,
-        responsive: true,
+        responsive: false,
         autoplay: true,
         muted: true,
         playbackRates: [0.5, 1, 1.5, 2],
-        aspectRatio: '16:9',
         controlBar: {
           children: [
             'playToggle',
