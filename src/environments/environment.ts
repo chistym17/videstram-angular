@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  backendUrl: 'http://localhost:8000'
+  production: true,
+  backendUrl: 'https://vidstream-backend-ft8i.onrender.com'
 }; 
