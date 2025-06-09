@@ -4,6 +4,7 @@ import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import { Video } from '../../services/video.service';
 
+
 @Component({
   selector: 'app-video-player',
   standalone: true,
