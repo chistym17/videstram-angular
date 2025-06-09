@@ -39,14 +39,13 @@ import { Video } from '../../services/video.service';
            (dragstart)="onDragStart($event)">
       </div>
 
-      <div class="aspect-w-16 aspect-h-9">
+      <!-- Video Wrapper -->
+      <div class="video-wrapper">
         <video
           #videoPlayer
           class="video-js vjs-big-play-centered vjs-theme-city"
           controls
           preload="auto"
-          width="100%"
-          height="100%"
           autoplay
           muted
           disablePictureInPicture
@@ -81,25 +80,70 @@ import { Video } from '../../services/video.service';
       -moz-user-select: none;
       -ms-user-select: none;
     }
+
     .video-container {
       @apply shadow-lg;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
     }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      background: #000;
+      overflow: hidden;
+    }
+
+    .video-wrapper video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
     :host ::ng-deep .video-js {
-      @apply w-full h-full;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
     }
+
+    :host ::ng-deep .vjs-tech {
+      object-fit: contain !important;
+    }
+
     :host ::ng-deep .vjs-big-play-button {
       @apply bg-indigo-600 border-indigo-600;
       @apply transform scale-125;
     }
+
     :host ::ng-deep .vjs-big-play-button:hover {
       @apply bg-indigo-700 border-indigo-700;
     }
+
     :host ::ng-deep .vjs-control-bar {
       @apply bg-black bg-opacity-75;
     }
+
     /* Disable video.js download button */
     :host ::ng-deep .vjs-download-button {
       display: none !important;
+    }
+
+    /* Ensure controls stay within container */
+    :host ::ng-deep .vjs-control-bar {
+      position: absolute !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
     }
   `]
 })
@@ -182,11 +226,12 @@ export class VideoPlayerComponent implements AfterViewInit, OnChanges, OnDestroy
 
     try {
       this.player = videojs(this.videoPlayerElement.nativeElement, {
-        fluid: true,
+        fluid: false,
         responsive: true,
         autoplay: true,
         muted: true,
         playbackRates: [0.5, 1, 1.5, 2],
+        aspectRatio: '16:9',
         controlBar: {
           children: [
             'playToggle',
