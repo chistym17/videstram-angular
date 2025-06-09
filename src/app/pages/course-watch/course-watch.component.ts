@@ -5,6 +5,8 @@ import { VideoPlayerComponent } from '../../components/video-player/video-player
 import { VideoPlaylistComponent } from '../../components/video-playlist/video-playlist.component';
 import { Video, VideoService } from '../../services/video.service';
 import { Course, CourseService } from '../../services/course.service';
+import { forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-course-watch',
@@ -20,16 +22,18 @@ import { Course, CourseService } from '../../services/course.service';
         </div>
 
         <!-- Main Content -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <!-- Video Player Section -->
-          <div class="lg:col-span-2">
-            @if (currentVideo) {
-              <app-video-player [video]="currentVideo" />
-            } @else {
-              <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-                <p class="text-gray-600">Select a video to start watching</p>
-              </div>
-            }
+          <div class="lg:col-span-3 flex justify-center">
+            <div class="w-full max-w-4xl">
+              @if (currentVideo) {
+                <app-video-player [video]="currentVideo" />
+              } @else {
+                <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+                  <p class="text-gray-600">Select a video to start watching</p>
+                </div>
+              }
+            </div>
           </div>
 
           <!-- Playlist Section -->
@@ -70,38 +74,47 @@ export class CourseWatchComponent implements OnInit {
 
   ngOnInit() {
     // Get course ID from route params
-    this.route.params.subscribe(params => {
-      const courseId = params['id'];
-      if (courseId) {
-        // Load course details
-        this.courseService.getCourse(courseId).subscribe(course => {
-          this.course = course;
-        });
+    this.route.params.pipe(
+      switchMap(params => {
+        const courseId = params['id'];
+        if (!courseId) return forkJoin([]);
 
-        // Load course videos
-        this.videoService.getVideosByCourseId(courseId).subscribe(videos => {
-          this.videos = videos;
+        // Load both course details and videos in parallel
+        return forkJoin({
+          course: this.courseService.getCourse(courseId),
+          videos: this.videoService.getVideosByCourseId(courseId)
+        });
+      })
+    ).subscribe({
+      next: (result: any) => {
+        if (result.course) {
+          this.course = result.course;
+        }
+        if (result.videos) {
+          this.videos = result.videos;
           
           // If there's a video ID in the URL, load that video
           this.route.queryParams.subscribe(queryParams => {
             const videoId = queryParams['video'];
             if (videoId) {
-              this.videoService.getVideoById(videoId).subscribe(video => {
-                if (video) {
-                  this.currentVideo = video;
-                } else {
-                  // If video not found, select first video
-                  this.currentVideo = this.videos[0];
-                  this.updateUrl();
-                }
-              });
+              const video = this.videos.find(v => v.id === videoId);
+              if (video) {
+                this.currentVideo = video;
+              } else {
+                // If video not found, select first video
+                this.currentVideo = this.videos[0];
+                this.updateUrl();
+              }
             } else if (this.videos.length > 0) {
               // If no video ID in URL, select first video
               this.currentVideo = this.videos[0];
               this.updateUrl();
             }
           });
-        });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading course data:', error);
       }
     });
   }
