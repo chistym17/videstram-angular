@@ -14,5 +14,10 @@ export const routes: Routes = [
     component: CoursesComponent,
     canActivate: [authGuard]
   },
+  {
+    path: 'course/:id/watch',
+    loadComponent: () => import('./pages/course-watch/course-watch.component').then(m => m.CourseWatchComponent),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: '' }
 ];

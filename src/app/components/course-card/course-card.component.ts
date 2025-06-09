@@ -8,69 +8,66 @@ import { Course } from '../../services/course.service';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
       <div class="relative">
         <img [src]="course.thumbnail" [alt]="course.title" class="w-full h-48 object-cover">
-        <div class="absolute top-4 right-4">
+        <div class="absolute top-2 right-2">
           <span [class]="getLevelBadgeClass()" class="px-2 py-1 rounded-full text-xs font-medium">
             {{ course.level }}
           </span>
         </div>
       </div>
 
-      <div class="p-6">
-        <div class="flex items-center mb-4">
-          <img [src]="course.instructorImage" [alt]="course.instructor" 
-               class="w-10 h-10 rounded-full object-cover">
-          <div class="ml-3">
-            <p class="text-sm font-medium text-gray-900">{{ course.instructor }}</p>
-            <p class="text-xs text-gray-500">{{ course.category }}</p>
-          </div>
+      <div class="p-4">
+        <div class="flex items-center space-x-2 mb-3">
+          <img [src]="course.instructor.avatar" [alt]="course.instructor.name" class="w-8 h-8 rounded-full">
+          <span class="text-sm text-gray-600">{{ course.instructor.name }}</span>
         </div>
 
-        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{{ course.title }}</h3>
-        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ course.description }}</p>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+          {{ course.title }}
+        </h3>
+
+        <p class="text-sm text-gray-600 mb-4 line-clamp-2">
+          {{ course.description }}
+        </p>
 
         <div class="flex flex-wrap gap-2 mb-4">
-          @for (topic of course.topics.slice(0, 2); track topic) {
-            <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs">
+          @for (topic of course.topics.slice(0, 3); track topic) {
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
               {{ topic }}
             </span>
           }
-          @if (course.topics.length > 2) {
-            <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-              +{{ course.topics.length - 2 }} more
+          @if (course.topics.length > 3) {
+            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              +{{ course.topics.length - 3 }} more
             </span>
           }
         </div>
 
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between text-sm text-gray-600 mb-4">
           <div class="flex items-center space-x-4">
-            <div class="flex items-center">
-              <i class="fas fa-video text-gray-400 mr-1"></i>
-              <span class="text-sm text-gray-600">{{ course.videoCount }} videos</span>
-            </div>
-            <div class="flex items-center">
-              <i class="fas fa-clock text-gray-400 mr-1"></i>
-              <span class="text-sm text-gray-600">{{ course.duration }}</span>
-            </div>
+            <span class="flex items-center">
+              <i class="fas fa-video mr-1"></i>
+              {{ course.videos }} videos
+            </span>
+            <span class="flex items-center">
+              <i class="fas fa-clock mr-1"></i>
+              {{ course.duration }}
+            </span>
           </div>
           <div class="flex items-center">
             <i class="fas fa-star text-yellow-400 mr-1"></i>
-            <span class="text-sm font-medium text-gray-900">{{ course.rating }}</span>
+            {{ course.rating.toFixed(1) }}
           </div>
         </div>
 
-        <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-500">
-            {{ course.enrolledStudents.toLocaleString() }} students
-          </div>
-          <a [routerLink]="['/course', course.id]" 
-             class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-            View Course
-            <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
+        <a
+          [routerLink]="['/course', course.id, 'watch']"
+          class="block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-200"
+        >
+          View Course
+        </a>
       </div>
     </div>
   `,
@@ -84,15 +81,16 @@ export class CourseCardComponent {
   @Input() course!: Course;
 
   getLevelBadgeClass(): string {
+    const baseClass = 'px-2 py-1 rounded-full text-xs font-medium';
     switch (this.course.level) {
       case 'Beginner':
-        return 'bg-green-100 text-green-800';
+        return `${baseClass} bg-green-100 text-green-800`;
       case 'Intermediate':
-        return 'bg-yellow-100 text-yellow-800';
+        return `${baseClass} bg-yellow-100 text-yellow-800`;
       case 'Advanced':
-        return 'bg-red-100 text-red-800';
+        return `${baseClass} bg-red-100 text-red-800`;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return `${baseClass} bg-gray-100 text-gray-800`;
     }
   }
 } 
