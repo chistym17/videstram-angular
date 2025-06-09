@@ -89,44 +89,26 @@ export class AuthService {
     this.state.next({ ...this.state.value, loading: true, error: null });
     
     try {
-      const response = await fetch(`${this.backendUrl}/get-token?video_id=sample1`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      // Dummy authentication for testing
+      const user: User = {
+        id: '1',
+        email: email,
+        name: email.split('@')[0],
+        role: 'student',
+        token: 'dummy-token'
+      };
+
+      if (this.isBrowser) {
+        localStorage.setItem('authToken', 'dummy-token');
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+
+      this.state.next({
+        user,
+        isAuthenticated: true,
+        loading: false,
+        error: null
       });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      const data = await response.json();
-      console.log('Token from API:', data);
-
-      if (data.token) {
-        // Create a minimal user object with just email and token
-        const user: User = {
-          id: 'temp-id', // We'll use a temporary ID since we don't have one from the API
-          email: email,
-          name: email.split('@')[0], // Use part of email as name
-          role: 'student',
-          token: data.token
-        };
-
-        if (this.isBrowser) {
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('user', JSON.stringify(user));
-        }
-
-        this.state.next({
-          user,
-          isAuthenticated: true,
-          loading: false,
-          error: null
-        });
-      } else {
-        throw new Error('No token received');
-      }
     } catch (error) {
       this.clearStorage();
       this.state.next({

@@ -2,14 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CourseService, Course } from '../services/course.service';
 import { CourseCardComponent } from '../components/course-card/course-card.component';
+import { NavbarComponent } from '../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, CourseCardComponent],
+  imports: [CommonModule, CourseCardComponent, NavbarComponent],
   template: `
-    <div class="min-h-screen bg-gray-50 py-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gray-50">
+      <!-- Navbar -->
+      <app-navbar />
+
+      <!-- Main Content -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Header Section -->
         <div class="text-center mb-12">
           <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">
